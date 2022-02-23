@@ -1,7 +1,7 @@
 library(readxl)
 library(tidyverse)
 
-data <- read.csv("C:/Users/terry/Downloads/clean.csv")
+data <- read.csv('C:/Users/chewb/Desktop/New folder/Y3S2/ST4248/project/brfss2020.csv')
 
 names(data)
 data[, c('DIABETE4' ,'_BMI5', 'SMOKE100', 'CVDSTRK3', '_MICHD', '_TOTINDA', '_RFDRHV7', 'HLTHPLN1', 'MEDCOST', 'GENHLTH', 'MENTHLTH', 'PHYSHLTH', 'DIFFWALK', 'COLGSEX', '_AGEG5YR', 'INCOME2', 'MARITAL', 'SLEPTIM1', 'CHECKUP1', '_IMPRACE')]
