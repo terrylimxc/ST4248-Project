@@ -56,5 +56,13 @@ clean <- clean %>% mutate(
   X_IMPRACE = X_IMPRACE - 1
 )
 
+
+names(clean) <- c("ID", "BMI", "SMOKER_TYPE", "HAS_STROKE", "HAS_HD", 
+                  "HAS_PHYACT", "HAS_HLTHPLAN", "HAS_MONEYPROB", "GENHLTH_LVL",
+                  "NUM_POORMENTHLTH", "NUM_POORPHYHLTH", "HAS_DIFFWALK", "SEX",
+                  "AGEGRP", "INCOMEGRP", "MARITALGRP", "NUM_SLEEP", "CHECKUP",
+                  "RACE", "NUM_POORHLTH", "NUM_DRINKSPERWK", "HAS_ECIG", 
+                  "IS_DIABETIC")
+
 # try minus 1 for X_AGEG5YR, X_INCOMG, MARITAL, X_IMPRACE, 
-write.csv(clean, 'C:/Users/chewb/Desktop/New folder/Y3S2/ST4248/project/clean.csv')
+write.csv(clean, 'C:/Users/chewb/Desktop/New folder/Y3S2/ST4248/project/clean.csv', row.names=FALSE)
