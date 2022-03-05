@@ -1,3 +1,7 @@
+# Run Line 2 to install the packages
+install.packages(c("corrplot", "rcompanion", "psych", "ltm"))
+
+# Import libraries
 library(readxl)
 library(tidyverse)
 library(corrplot)
@@ -5,11 +9,11 @@ library(rcompanion)
 library(psych)
 library(ltm)
 
-data <- read.csv("C:/Users/terry/Downloads/new.csv")
+data <- read.csv("C:/Users/terry/Downloads/clean.csv")
 
-cols <- c("ID", "SMOKER_TYPE", "HAS_STROKE", "HAS_HD", "HAS_PHYACT", 
-          "HAS_HLTHPLAN", "HAS_MONEYPROB", "GENHLTH_LVL", "HAS_DIFFWALK", "SEX",
-          "AGEGRP", "INCOMEGRP", "MARITALGRP", "CHECKUP", "RACE", "HAS_ECIG")
+cols <- c("SMOKER_TYPE", "HAS_STROKE", "HAS_HD", "HAS_PHYACT", "HAS_HLTHPLAN", 
+          "HAS_MONEYPROB", "GENHLTH_LVL", "HAS_DIFFWALK", "SEX", "AGEGRP", 
+          "INCOMEGRP", "MARITALGRP", "CHECKUP", "RACE", "HAS_ECIG")
 
 data[cols] <- lapply(data[cols], as.factor)
 
