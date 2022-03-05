@@ -1,12 +1,9 @@
 library(readxl)
 library(tidyverse)
 
-data <- read.csv('C:/Users/chewb/Desktop/New folder/Y3S2/ST4248/project/brfss2020.csv')
+data <- read.csv("C:/Users/terry/Downloads/brfss2020.csv")
 
-names(data)
-data[, c('DIABETE4' ,'_BMI5', 'SMOKE100', 'CVDSTRK3', '_MICHD', '_TOTINDA', '_RFDRHV7', 'HLTHPLN1', 'MEDCOST', 'GENHLTH', 'MENTHLTH', 'PHYSHLTH', 'DIFFWALK', 'COLGSEX', '_AGEG5YR', 'INCOME2', 'MARITAL', 'SLEPTIM1', 'CHECKUP1', '_IMPRACE')]
-
-str(data)
+#str(data)
 extracted <- data[, c("DIABETE4", "X_BMI5", "X_SMOKER3", "CVDSTRK3", "X_MICHD", "X_TOTINDA", "HLTHPLN1", "MEDCOST", "GENHLTH", "MENTHLTH", "PHYSHLTH", "DIFFWALK", "X_SEX", "X_AGEG5YR", "X_INCOMG", "MARITAL", "SLEPTIM1", "CHECKUP1", "X_IMPRACE", "POORHLTH", "X_DRNKWK1", "ECIGNOW")]
 
 extracted <- mutate(extracted, ECIGNOW = if_else(is.na(ECIGNOW), 4, ECIGNOW)) %>% mutate(POORHLTH = if_else(is.na(POORHLTH), 88, POORHLTH))
@@ -19,7 +16,6 @@ drop <- extracted %>% drop_na()
 drop <- drop[drop$DIABETE4 < 7, ]
 
 # drop those who dont know if they had a stroke or refused
-
 clean <- drop %>% filter(X_SMOKER3 < 9 & CVDSTRK3 < 7 & X_TOTINDA < 9  & HLTHPLN1<7 & MEDCOST<7 & GENHLTH<7 & MENTHLTH != 77 & MENTHLTH != 99 & PHYSHLTH != 77 & PHYSHLTH != 99 & DIFFWALK<7 & X_AGEG5YR < 14 & X_INCOMG < 9 & MARITAL<9 & SLEPTIM1 < 77 & CHECKUP1 != 7 & CHECKUP1!=9 & POORHLTH!=77 & POORHLTH!=99 & X_DRNKWK1 != 99900 & ECIGNOW <7)
 
 # combine diabetes
@@ -56,7 +52,7 @@ clean <- clean %>% mutate(
   X_IMPRACE = X_IMPRACE - 1
 )
 
-
+# Rename columns
 names(clean) <- c("ID", "BMI", "SMOKER_TYPE", "HAS_STROKE", "HAS_HD", 
                   "HAS_PHYACT", "HAS_HLTHPLAN", "HAS_MONEYPROB", "GENHLTH_LVL",
                   "NUM_POORMENTHLTH", "NUM_POORPHYHLTH", "HAS_DIFFWALK", "SEX",
@@ -65,4 +61,4 @@ names(clean) <- c("ID", "BMI", "SMOKER_TYPE", "HAS_STROKE", "HAS_HD",
                   "IS_DIABETIC")
 
 # try minus 1 for X_AGEG5YR, X_INCOMG, MARITAL, X_IMPRACE, 
-write.csv(clean, 'C:/Users/chewb/Desktop/New folder/Y3S2/ST4248/project/clean.csv', row.names=FALSE)
+write.csv(clean, 'clean.csv', row.names=FALSE)
