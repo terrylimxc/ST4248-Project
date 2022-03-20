@@ -5,9 +5,11 @@ library(tidyverse)
 data <- read.csv("C:/Users/terry/Downloads/brfss2020.csv")
 
 #str(data)
-extracted <- data[, c("DIABETE4", "X_BMI5", "X_SMOKER3", "CVDSTRK3", "X_MICHD", "X_TOTINDA", "HLTHPLN1", "MEDCOST", "GENHLTH", "MENTHLTH", "PHYSHLTH", "DIFFWALK", "X_SEX", "X_AGEG5YR", "X_INCOMG", "MARITAL", "SLEPTIM1", "CHECKUP1", "X_IMPRACE", "POORHLTH", "X_DRNKWK1", "ECIGNOW")]
+extracted <- data[, c("DIABETE4", "X_BMI5", "X_SMOKER3", "CVDSTRK3", "X_MICHD", "X_TOTINDA", "HLTHPLN1", "MEDCOST", "GENHLTH", "MENTHLTH", "PHYSHLTH", "DIFFWALK", "X_SEX", "X_AGEG5YR", "X_INCOMG", "MARITAL", "SLEPTIM1", "CHECKUP1", "X_IMPRACE", "POORHLTH", "X_DRNKWK1", "ECIGNOW", "ECIGARET")]
 
-extracted <- mutate(extracted, ECIGNOW = if_else(is.na(ECIGNOW), 4, ECIGNOW)) %>% mutate(POORHLTH = if_else(is.na(POORHLTH), 88, POORHLTH))
+extracted <- mutate(extracted, ECIGNOW = if_else(is.na(ECIGNOW) & (ECIGARET == 2), 4, ECIGNOW)) %>% mutate(POORHLTH = if_else(is.na(POORHLTH), 88, POORHLTH))
+
+extracted <- subset(extracted, select = -c(ECIGARET))
 
 drop <- extracted %>% drop_na()
 
