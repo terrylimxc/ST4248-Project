@@ -1,0 +1,200 @@
+---
+title: "Untitled"
+author: "Wen Yong"
+date: "3/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list=ls())
+
+#install.packages("xgboost")
+require(xgboost)
+library(tidyverse)
+library(caret)
+library(reshape2)
+library(Ecdat)
+
+
+data <- read.csv("C:/Users/wenyo/Desktop/y3s2/ST4248/updated clean+outliersremoved.csv")
+data <- data %>% 
+  select(-c(X, NUM_POORHLTH)) %>%
+  mutate(IS_DIABETIC = as.factor(IS_DIABETIC))
+ 
+attach(data)
+```
+
+```{r}
+# Train Test Split 70-30
+set.seed(4248)
+
+idx <- createDataPartition(y = IS_DIABETIC, p=0.7, list=FALSE)
+train_id <- idx #index of training observations
+train <- data[train_id,]
+test <- data[-train_id,]
+set.seed(4248)
+train <- downSample(x = subset(train, 
+                      select = -c(IS_DIABETIC)),
+           y = train$IS_DIABETIC)
+
+train <- train %>% mutate(IS_DIABETIC = as.numeric(Class) - 1) %>% select(-c(Class))
+
+xtrain <- subset(train, 
+                 select = -c(IS_DIABETIC))
+ytrain <- train$IS_DIABETIC
+xtest <- subset(test, 
+                 select = -c(IS_DIABETIC))
+ytest <- test$IS_DIABETIC
+dtrain <- xgb.DMatrix(data = as.matrix(xtrain), label = as.matrix(ytrain)) 
+dvalid <- xgb.DMatrix(data = as.matrix(xtest), label = as.matrix(ytest)) 
+```
+
+```{r}
+# Train Test Split 70-30
+set.seed(4248)
+
+idx <- createDataPartition(y = IS_DIABETIC, p=0.7, list=FALSE)
+train_id <- idx #index of training observations
+train <- data[train_id,]
+test <- data[-train_id,]
+
+
+xtrain <- subset(train, 
+                 select = -c(IS_DIABETIC))
+ytrain <- train$IS_DIABETIC
+xtest <- subset(test, 
+                 select = -c(IS_DIABETIC))
+ytest <- test$IS_DIABETIC
+dtrain <- xgb.DMatrix(data = as.matrix(xtrain), label = as.matrix(ytrain)) 
+dvalid <- xgb.DMatrix(data = as.matrix(xtest), label = as.matrix(ytest)) 
+
+bstSparse <- xgb.train(data = dtrain, 
+                     max.depth = 8, 
+                     eta = 0.294, 
+                     nthread = 2, 
+                     nrounds = 10,
+                     subsample = 0.987,
+                     colsample_bytree = 0.774,
+                     min_child_weight = 8,
+                     booster = 'gbtree',
+                     objective = "binary:logistic",
+                     scale_pos_weight = 9)
+
+pred <- predict(bstSparse, as.matrix(subset(test, 
+                                  select = -c(IS_DIABETIC))))
+prediction <- as.numeric(pred > 0.5)
+head(prediction)
+table(predict=prediction, truth=test$IS_DIABETIC)
+accuracy <- accuracy(test$IS_DIABETIC, prediction)
+recall <- recall(test$IS_DIABETIC, prediction)
+precision <- precision(as.numeric(test$IS_DIABETIC)-1, prediction)
+auc <- auc(test$IS_DIABETIC, prediction)
+f1 <- 2*(precision*recall)/ (precision + recall)
+```
+
+### ROC
+```{r}
+library(ROCR)
+rocplot=function(pred, truth, ...){ #wrapper to do the plot for us after we give it the pred and truth
+  predob = prediction(pred, truth)
+  perf = performance(predob, "tpr", "fpr")
+  plot(perf,...)}
+#par(mfrow=c(1,2))
+rocplot(prediction, test$IS_DIABETIC,main="Training Data")
+```
+
+```{r}
+# Take start time to measure time of random search algorithm
+start.time <- Sys.time()
+
+# Create empty lists
+lowest_error_list = list()
+parameters_list = list()
+
+# Create 10,000 rows with random hyperparameters
+set.seed(20)
+for (iter in 1:10000){
+  param <- list(booster = "gbtree",
+                objective = "binary:logistic",
+                max_depth = sample(5:10, 1),
+                eta = runif(1, .01, .3),
+                subsample = runif(1, .7, 1),
+                colsample_bytree = runif(1, .6, 1),
+                min_child_weight = sample(0:10, 1),
+                scale_pos_weight = sample(c(1,5,10,25,50,75,100,200),1)
+  )
+  parameters <- as.data.frame(param)
+  parameters_list[[iter]] <- parameters
+}
+
+# Create object that contains all randomly created hyperparameters
+parameters_df = do.call(rbind, parameters_list)
+
+# Use randomly created parameters to create 10,000 XGBoost-models
+for (row in 1:nrow(parameters_df)) {
+  set.seed(20)
+  mdcv <- xgb.train(data=dtrain,
+                    objective = "binary:logistic",
+                    max_depth = parameters_df$max_depth[row],
+                    eta = parameters_df$eta[row],
+                    subsample = parameters_df$subsample[row],
+                    colsample_bytree = parameters_df$colsample_bytree[row],
+                    min_child_weight = parameters_df$min_child_weight[row],
+                    scale_pos_weight = parameters_df$scale_pos_weight[row],
+                    nrounds= 10,
+                    eval_metric = "logloss",
+                    print_every_n = 100,
+                    watchlist = list(train= dtrain, val= dvalid)
+  )
+  lowest_error <- as.data.frame(1 - min(mdcv$evaluation_log$val_logloss))
+  lowest_error_list[[row]] <- lowest_error
+}
+
+# Create object that contains all accuracy's
+lowest_error_df = do.call(rbind, lowest_error_list)
+
+# Bind columns of accuracy values and random hyperparameter values
+randomsearch = cbind(lowest_error_df, parameters_df)
+
+# Quickly display best validation loss
+max(randomsearch[,1])
+
+# Stop time and calculate difference
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+time.taken
+
+write_csv(randomsearch, "C:/Users/wenyo/Desktop/y3s2/ST4248/hello.csv")
+```
+
+
+## new params 
+```{r}
+
+gridsearch_model <- xgb.train(data = dtrain, 
+                     max.depth = 6, 
+                     eta = 0.294, 
+                     nthread = 2, 
+                     nrounds = 10,
+                     subsample = 0.737,
+                     colsample_bytree = 0.652,
+                     min_child_weight = 7,
+                     booster = 'gbtree',
+                     objective = "binary:logistic",
+                     scale_pos_weight = 1)
+
+pred <- predict(gridsearch_model, as.matrix(subset(test, 
+                                            select = -c(IS_DIABETIC))))
+prediction <- as.numeric(pred > 0.5)
+#head(prediction)
+table(predict=prediction, truth=test$IS_DIABETIC)
+accuracy <- accuracy(test$IS_DIABETIC, prediction)
+recall <- recall(test$IS_DIABETIC, prediction)
+precision <- precision(as.numeric(test$IS_DIABETIC)-1, prediction)
+auc <- auc(test$IS_DIABETIC, prediction)
+f1 <- 2*(precision*recall)/ (precision + recall)
+```
