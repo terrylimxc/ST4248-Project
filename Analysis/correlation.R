@@ -9,7 +9,7 @@ library(rcompanion)
 library(psych)
 library(ltm)
 
-data <- read.csv("C:/Users/terry/Downloads/updated clean+outliersremoved.csv")
+data <- read.csv("cleanwitholdnameswooutlier.csv")
 
 cols <- c("SMOKER_TYPE", "HAS_STROKE", "HAS_HD", "HAS_PHYACT", "HAS_HLTHPLAN", 
           "HAS_MONEYPROB", "GENHLTH_LVL", "HAS_DIFFWALK", "SEX", "AGEGRP", 
@@ -25,8 +25,8 @@ data_con <- data[c("BMI", "NUM_POORMENTHLTH", "NUM_POORPHYHLTH", "NUM_SLEEP",
 corrplot(cor(data_con), type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
 
-## Moderate correlation between NUM_POORHLTH and NUM_POORPHYHLTH (0.611) 
-## and between NUMPOORHLTH and NUM_POORMENTHLTH (0.451)
+## Moderate correlation between NUM_POORHLTH and NUM_POORPHYHLTH (0.605) 
+## and between NUMPOORHLTH and NUM_POORMENTHLTH (0.453)
 
 ### Proposed to remove NUM_POORHLTH
 
@@ -50,7 +50,7 @@ cramer_vals[cramer_vals >= 0.5]
 
 # Check for correlation between categorical variables (binary)
 cols2 <- c("HAS_STROKE", "HAS_HD", "HAS_PHYACT", "HAS_HLTHPLAN", "HAS_MONEYPROB", 
-          "HAS_DIFFWALK", "SEX", "IS_DIABETIC")
+           "HAS_DIFFWALK", "SEX", "IS_DIABETIC")
 
 data_cat2 <- data[cols2]
 pairs <- t(combn(cols2,2))
@@ -93,6 +93,3 @@ pb_vals[pb_vals >= 0.5]
 pb_vals[pb_vals <= -0.5]
 
 ## All good
-
-
-
