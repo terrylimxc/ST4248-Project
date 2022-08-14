@@ -4,7 +4,7 @@ National University of Singapore (NUS) ST4248 Project on predicting Diabetic Sta
 ## Repository Content
 * [Analysis](https://github.com/terrylimxc/ST4248-Project/tree/main/Analysis)
 * [Models](https://github.com/terrylimxc/ST4248-Project/tree/main/Models)
-* [Data]()
+* [Dataset](https://github.com/terrylimxc/ST4248-Project/tree/main/Dataset)
 * [Report](https://github.com/terrylimxc/ST4248-Project/blob/main/Report.pdf)
 * [Slides](https://github.com/terrylimxc/ST4248-Project/blob/main/Final%20Presentation.pdf)
 
