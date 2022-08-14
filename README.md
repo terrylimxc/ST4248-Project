@@ -1,5 +1,5 @@
 # ST4248-Project
-ST4248 Project on Diabetes 
+National University of Singapore (NUS) ST4248 Project on predicting Diabetic Status of respondents based on their answers to health related questions
 
 This is a group project by Lim Xi Chen Terry, Chan Wen Yong, Low Hon Zheng and Chew BangYao Paul done in Semester 2 of AY21/22 for ST4248, Statistical Learning Methods II
 
