@@ -1,5 +1,5 @@
 # ST4248-Project
-ST4248 Project on Diabetes 
+National University of Singapore (NUS) ST4248 Project on predicting Diabetic Status of respondents based on their answers to health related questions
 
 ## Repository Content
 * [Analysis](https://github.com/terrylimxc/ST4248-Project/tree/main/Analysis)
