@@ -1,6 +1,6 @@
 library(tidyverse)
 
-data <- read_csv("updated clean+outliersremoved.csv", col_types='-ifffffffiifffffiff-iff')
+data <- read_csv("cleanwitholdnameswooutlier.csv", col_types='-ifffffffiifffffiff-iff')
 data$IS_DIABETIC <- factor(data$IS_DIABETIC, levels = c("0","1"), labels=c("0","1"))
 
 
