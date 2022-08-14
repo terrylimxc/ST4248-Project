@@ -16,8 +16,7 @@ rm(list=ls())
 require(xgboost)
 library(tidyverse)
 library(caret)
-library(reshape2)
-library(Ecdat)
+library(pROC)
 
 
 data <- read.csv("C:/Users/wenyo/Desktop/y3s2/ST4248/updated clean+outliersremoved.csv")
@@ -73,27 +72,32 @@ dtrain <- xgb.DMatrix(data = as.matrix(xtrain), label = as.matrix(ytrain))
 dvalid <- xgb.DMatrix(data = as.matrix(xtest), label = as.matrix(ytest)) 
 
 bstSparse <- xgb.train(data = dtrain, 
-                     max.depth = 8, 
+                     max.depth = 7, 
                      eta = 0.294, 
                      nthread = 2, 
                      nrounds = 10,
-                     subsample = 0.987,
-                     colsample_bytree = 0.774,
-                     min_child_weight = 8,
+                     subsample = 0.737,
+                     colsample_bytree = 0.652,
+                     min_child_weight = 7,
                      booster = 'gbtree',
                      objective = "binary:logistic",
-                     scale_pos_weight = 9)
+                     scale_pos_weight = 5
+                     )
 
 pred <- predict(bstSparse, as.matrix(subset(test, 
                                   select = -c(IS_DIABETIC))))
 prediction <- as.numeric(pred > 0.5)
 head(prediction)
-table(predict=prediction, truth=test$IS_DIABETIC)
-accuracy <- accuracy(test$IS_DIABETIC, prediction)
-recall <- recall(test$IS_DIABETIC, prediction)
-precision <- precision(as.numeric(test$IS_DIABETIC)-1, prediction)
-auc <- auc(test$IS_DIABETIC, prediction)
+conf <- table(predict=prediction, truth=test$IS_DIABETIC)
+accuracy <- (conf[1,1]+conf[2,2]) / 49909
+recall <- conf[2,2] / (conf[2,2] + conf[1,2])
+precision <- conf[2,2] / (conf[2,2] + conf[2,1])
+auc_score <- auc(test$IS_DIABETIC, prediction)
 f1 <- 2*(precision*recall)/ (precision + recall)
+
+
+xgb.importance(model = bstSparse)
+xgb.plot.importance(xgb.importance(model= bstSparse))
 ```
 
 ### ROC
